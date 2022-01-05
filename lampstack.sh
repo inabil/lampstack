@@ -24,7 +24,9 @@ then
 	yum install httpd httpd-tools vim net-tools -y
 	systemctl start httpd
 	systemctl enable httpd
-	systemctl status httpd
+	systemctl status httpd;
+#	apachectl graceful
+#	apachectl -S
 	yum install php php-fpm php-mysqlnd php-opcache php-gd php-xml php-mbstring -y
 	systemctl start php-fpm
 	systemctl enable php-fpm
@@ -41,6 +43,24 @@ y
 y
 y
 EOF
+	#Apache configs
+	echo 'ServerName 127.0.0.1' >> /etc/httpd/conf/httpd.conf
+	mkdir /etc/httpd/vhosts.d
+	cp mydomain.conf /etc/httpd/vhosts.d/
+	mkdir -p /var/www/vhosts/mydomain
+	echo '127.0.0.1 mydomain.com' >> /etc/hosts
+	touch /var/www/vhosts/mydomain/index.php
+	echo '<?php phpinfo() ?>' >> /var/www/vhosts/mydomain/index.php
+	echo 'Include vhosts.d/*.conf' >> /etc/httpd/conf/httpd.conf
+	apachectl configtest
+	#Check if Apache is OK then reload
+	if apachectl -S; then
+	  apachectl graceful
+	  curl --silent http://mydomain.com/index.php | grep -w 'head'
+	else
+  	echo 'apache config failed, check errors'
+	fi
+	echo 'Database Password:$DBPASS'
 	#mysql -uroot -p
 	#Enable PHP/HTTPD Modules if required.
 	#a2enmod rewrite

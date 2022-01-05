@@ -1,0 +1,33 @@
+<VirtualHost *:443>
+	ServerName mydomain.com
+        ServerAlias www.mydomain.com 10.50.28.27
+	DocumentRoot "/var/www/vhosts/mydomain"
+#Include /etc/httpd/vhosts.d/allow-methods.conf
+	AddDefaultCharset UTF-8
+        ErrorLog logs/mydomain.error_log
+        CustomLog logs/mydomain.access_log combined
+        LogLevel debug
+	<Directory "/var/www/vhosts/mydomain" >
+    		Options FollowSymLinks
+    		AllowOverride All
+   	</Directory>
+
+SSLEngine on
+
+        SSLProtocol All -SSLv2 -SSLv3
+        SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+        SSLCertificateFile    /etc/pki/tls/mydomain.crt
+        SSLCertificateKeyFile /etc/pki/tls/server.key.pem
+        SSLCACertificateFile /etc/pki/tls/CertCA.crt
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+
+</VirtualHost>
