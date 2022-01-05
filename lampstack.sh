@@ -24,7 +24,8 @@ then
 	yum install httpd httpd-tools vim net-tools -y
 	systemctl start httpd
 	systemctl enable httpd
-	systemctl status httpd;
+	ps aux | grep httpd
+#	systemctl status httpd;
 #	apachectl graceful
 #	apachectl -S
 	yum install php php-fpm php-mysqlnd php-opcache php-gd php-xml php-mbstring -y
@@ -60,7 +61,8 @@ EOF
 	else
   	echo 'apache config failed, check errors'
 	fi
-	echo 'Database Password:$DBPASS'
+	echo 'Database Password:'
+	echo $DBPASS
 	#mysql -uroot -p
 	#Enable PHP/HTTPD Modules if required.
 	#a2enmod rewrite
