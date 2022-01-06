@@ -48,6 +48,7 @@ EOF
 	echo 'ServerName 127.0.0.1' >> /etc/httpd/conf/httpd.conf
 	mkdir /etc/httpd/vhosts.d
 	cp mydomain.conf /etc/httpd/vhosts.d/
+	cp ssl-mydomain.conf-default /etc/httpd/vhosts.d/
 	mkdir -p /var/www/vhosts/mydomain
 	echo '127.0.0.1 mydomain.com' >> /etc/hosts
 	touch /var/www/vhosts/mydomain/index.php
