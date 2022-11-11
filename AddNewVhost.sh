@@ -29,7 +29,7 @@ fi
 
 cp $DEFAULTFILE /etc/httpd/vhosts.d/$DOMAINNAME.conf
 
-sed -i 's/mydomain/$DOMAINNAME/g' /etc/httpd/vhosts.d/$DOMAINNAME.conf
+sed -i "s/mydomain/$DOMAINNAME/g" /etc/httpd/vhosts.d/$DOMAINNAME.conf
 mkdir /var/www/vhosts/$DOMAINNAME
 echo "Your Project Directory is : /var/www/vhosts/$DOMAINNAME"
 
