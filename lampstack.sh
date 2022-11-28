@@ -5,7 +5,8 @@
 E_BADARGS=65
 DATE=$(date +"%Y%m%d-%T")
 
-OSVERSION=`cat /etc/os-release | grep -w 'ID' | sed -e 's/"//g' -e 's/ID=//';`
+#OSVERSION=`cat /etc/os-release | grep -w 'ID' | sed -e 's/"//g' -e 's/ID=//';`
+OSVERSION=`grep -w 'ID' < /etc/os-release | sed -e 's/"//g' -e 's/ID=//';`
 LOGS="/tmp/lampstack.log"
 
 DBPASS="pakistan"
@@ -73,7 +74,7 @@ EOF
 	#firewall-cmd --permanent --zone=public --add-service=http
 	#firewall-cmd --permanent --zone=public --add-service=https
 	#systemctl reload firewalld
-elif [[ $OSVERSION == "centos" ]]
+elif [[ $OSVERSION == "ubuntu" ]]
 then
 	echo "Section in progress"
 
