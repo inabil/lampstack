@@ -18,9 +18,8 @@ fi
 
 #Starting Installation
 
-if [[ $OSVERSION == "ol" ]]
-then
-	echo "Installing LAMP on Oracle Linux"
+if [[ $OSVERSION == "ol" ]] ||  [[ $OSVERSION == "centos" ]] ||  [[ $OSVERSION == "redhat" ]]; then
+	echo "Installing LAMP on $OSVERSION"
 	yum update -y
 	yum install httpd httpd-tools vim net-tools -y
 	systemctl start httpd
@@ -74,20 +73,15 @@ EOF
 	#firewall-cmd --permanent --zone=public --add-service=http
 	#firewall-cmd --permanent --zone=public --add-service=https
 	#systemctl reload firewalld
-elif [[ $OSVERSION == "ubuntu" ]]
-then
+if [[ $OSVERSION == "debian" ]] ||  [[ $OSVERSION == "ubuntu" ]] ||  [[ $OSVERSION == "pop" ]]; then
 	echo "Section in progress"
 
-elif [[ $OSVERSION == "debian" ]]
+elif [[ $OSVERSION == "unknown" ]]
 then
-	echo "Section in progress"
-
-elif [[ $OSVERSION == "centos" ]]
-then
-	echo "Section in progress"
+	echo "OS Unknown! ----- $OSVERSION "
 
 else
-	echo "OS does not match!"
+	echo "OS does not match required configurations!"
 fi
 
 
