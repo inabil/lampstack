@@ -73,7 +73,7 @@ EOF
 	#firewall-cmd --permanent --zone=public --add-service=http
 	#firewall-cmd --permanent --zone=public --add-service=https
 	#systemctl reload firewalld
-if [[ $OSVERSION == "debian" ]] ||  [[ $OSVERSION == "ubuntu" ]] ||  [[ $OSVERSION == "pop" ]]; then
+elif [[ $OSVERSION == "debian" ]] ||  [[ $OSVERSION == "ubuntu" ]] ||  [[ $OSVERSION == "pop" ]]; then
 	echo "Section in progress"
 
 elif [[ $OSVERSION == "unknown" ]]
