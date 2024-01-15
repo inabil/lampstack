@@ -21,7 +21,7 @@ fi
 if [[ $OSVERSION == "ol" ]] ||  [[ $OSVERSION == "centos" ]] ||  [[ $OSVERSION == "redhat" ]]; then
 	echo "Installing LAMP on $OSVERSION"
 	yum update -y
-	yum install httpd httpd-tools vim net-tools -y
+	yum install httpd httpd-tools vim net-tools mod_ssl -y
 	systemctl start httpd
 	systemctl enable httpd
 	ps aux | grep httpd
