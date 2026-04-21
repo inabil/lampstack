@@ -1,11 +1,10 @@
 #!/bin/bash
-# LAMP Stack Installer (MySQL + Latest PHP 8.x)
+# LAMP Stack Installer (Native MySQL + PHP 8.x)
 # Author: nabil@techie.com
 
 set -e
 
 DBPASS="pakistan"
-
 OS_ID=$(grep -w ID /etc/os-release | cut -d= -f2 | tr -d '"')
 
 if [[ $EUID -ne 0 ]]; then
@@ -31,9 +30,9 @@ if [[ "$OS_ID" =~ ^(ol|rhel|centos|rocky|almalinux)$ ]]; then
     systemctl enable --now httpd
 
     ################################
-    # PHP 8.x (LATEST AVAILABLE)
+    # PHP 8.x (latest available in AppStream)
     ################################
-    echo "Installing latest PHP 8.x..."
+    echo "Installing PHP 8.x..."
 
     dnf -y module reset php
 
@@ -49,29 +48,34 @@ if [[ "$OS_ID" =~ ^(ol|rhel|centos|rocky|almalinux)$ ]]; then
     systemctl enable --now php-fpm
 
     ################################
-    # MySQL
+    # MySQL (Native Oracle Linux Repo)
     ################################
-    echo "Installing MySQL..."
+    echo "Installing MySQL from native OS repo..."
 
-    if [[ $OS_MAJOR -eq 8 ]]; then
-        MYSQL_RPM="https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm"
-    else
-        MYSQL_RPM="https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm"
-    fi
-
-    dnf -y install $MYSQL_RPM
-    dnf -y install mysql-community-server
+    dnf -y install mysql-server
 
     systemctl enable --now mysqld
 
-    TEMP_PASS=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
+    ################################
+    # Secure MySQL (OL default setup)
+    ################################
+    MYSQL_TEMP_PASS=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}' || true)
 
-    mysql --connect-expired-password -uroot -p"$TEMP_PASS" <<EOF
+    if [[ -n "$MYSQL_TEMP_PASS" ]]; then
+mysql --connect-expired-password -uroot -p"$MYSQL_TEMP_PASS" <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$DBPASS';
 DELETE FROM mysql.user WHERE User='';
 DROP DATABASE IF EXISTS test;
 FLUSH PRIVILEGES;
 EOF
+    else
+mysql -uroot <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$DBPASS';
+DELETE FROM mysql.user WHERE User='';
+DROP DATABASE IF EXISTS test;
+FLUSH PRIVILEGES;
+EOF
+    fi
 
     ################################
     # Apache config
@@ -104,15 +108,13 @@ elif [[ "$OS_ID" =~ ^(debian|ubuntu|pop)$ ]]; then
     systemctl enable --now apache2
 
     ################################
-    # PHP 8.x (latest distro packages)
+    # PHP 8.x
     ################################
-    echo "Installing PHP 8.x..."
-
     apt install -y \
         php php-fpm php-mysql php-cli php-gd php-xml php-mbstring php-curl
 
     ################################
-    # MySQL
+    # MySQL (native apt repo)
     ################################
     DEBIAN_FRONTEND=noninteractive apt install -y mysql-server
     systemctl enable --now mysql
