@@ -30,7 +30,7 @@ if [[ "$OS_ID" =~ ^(ol|rhel|centos|rocky|almalinux)$ ]]; then
     systemctl enable --now httpd
 
     ################################
-    # PHP 8.x (latest available in AppStream)
+    # PHP 8.x
     ################################
     echo "Installing PHP 8.x..."
 
@@ -48,16 +48,15 @@ if [[ "$OS_ID" =~ ^(ol|rhel|centos|rocky|almalinux)$ ]]; then
     systemctl enable --now php-fpm
 
     ################################
-    # MySQL (Native Oracle Linux Repo)
+    # MySQL (Native Repo)
     ################################
-    echo "Installing MySQL from native OS repo..."
+    echo "Installing MySQL..."
 
     dnf -y install mysql-server
-
     systemctl enable --now mysqld
 
     ################################
-    # Secure MySQL (OL default setup)
+    # Secure MySQL
     ################################
     MYSQL_TEMP_PASS=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}' || true)
 
@@ -78,19 +77,39 @@ EOF
     fi
 
     ################################
-    # Apache config
+    # Apache configs (your block)
     ################################
-    echo "ServerName 127.0.0.1" >> /etc/httpd/conf/httpd.conf
+    echo "Configuring Apache virtual host..."
+
+    grep -q "ServerName 127.0.0.1" /etc/httpd/conf/httpd.conf || \
+        echo 'ServerName 127.0.0.1' >> /etc/httpd/conf/httpd.conf
+
+    mkdir -p /etc/httpd/vhosts.d
+
+    # Copy only if files exist
+    [[ -f mydomain.conf ]] && cp mydomain.conf /etc/httpd/vhosts.d/
+    [[ -f ssl-mydomain.conf-default ]] && cp ssl-mydomain.conf-default /etc/httpd/vhosts.d/
 
     mkdir -p /var/www/vhosts/mydomain
+
+    grep -q "mydomain.com" /etc/hosts || \
+        echo '127.0.0.1 mydomain.com' >> /etc/hosts
 
     cat > /var/www/vhosts/mydomain/index.php <<EOF
 <?php phpinfo(); ?>
 EOF
 
-    echo "127.0.0.1 mydomain.com" >> /etc/hosts
+    grep -q "vhosts.d" /etc/httpd/conf/httpd.conf || \
+        echo 'Include vhosts.d/*.conf' >> /etc/httpd/conf/httpd.conf
 
-    apachectl configtest && systemctl reload httpd
+    apachectl configtest
+
+    if apachectl -S; then
+        apachectl graceful
+        curl --silent http://mydomain.com/index.php | grep -w 'head' || true
+    else
+        echo 'apache config failed, check errors'
+    fi
 
 ########################################
 # Debian / Ubuntu / Pop!_OS
@@ -114,7 +133,7 @@ elif [[ "$OS_ID" =~ ^(debian|ubuntu|pop)$ ]]; then
         php php-fpm php-mysql php-cli php-gd php-xml php-mbstring php-curl
 
     ################################
-    # MySQL (native apt repo)
+    # MySQL
     ################################
     DEBIAN_FRONTEND=noninteractive apt install -y mysql-server
     systemctl enable --now mysql
@@ -135,7 +154,8 @@ EOF
 <?php phpinfo(); ?>
 EOF
 
-    echo "127.0.0.1 mydomain.com" >> /etc/hosts
+    grep -q "mydomain.com" /etc/hosts || \
+        echo "127.0.0.1 mydomain.com" >> /etc/hosts
 
     systemctl restart apache2
 
