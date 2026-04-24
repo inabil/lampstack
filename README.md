@@ -14,4 +14,4 @@
 
 
 ### What this Script will do
-* Use master.sh for generic configurations with *MySQL Server*
+* Use ***master.sh*** for installation with ***MySQL Server***
