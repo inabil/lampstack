@@ -14,4 +14,4 @@
 
 
 ### Need MYSQL server for stack!!!
-* Use ***master.sh*** for installation with ***MySQL Server***
+* Use ***master.sh*** for installation if ***MySQL Server*** needed for stack.
