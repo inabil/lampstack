@@ -13,5 +13,5 @@
 * CentOS/Redhat
 
 
-### What this Script will do
+### Need MYSQL server for stack!!!
 * Use ***master.sh*** for installation with ***MySQL Server***
