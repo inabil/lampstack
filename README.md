@@ -11,3 +11,7 @@
 * Ubuntu
 * Debian
 * CentOS/Redhat
+
+
+### What this Script will do
+* Use master.sh for generic configurations with *MySQL Server*
